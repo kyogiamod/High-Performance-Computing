@@ -25,3 +25,17 @@ int readFile(char* fileName, int* in){
 
     return 1;
 }
+
+int saveFile(char* fileName, int* out, int rows){
+
+    FILE* file = fopen(fileName, "wb");
+
+    if(!file) { printf("No se pudo abrir el archivo"); return 0; }
+
+    int length = rows * rows * sizeof(int);
+    if(fwrite(out, length, 1, file) < 1) { 
+        printf("Error guardando en el archivo");
+        return 0;
+    }
+    return 1;
+}
