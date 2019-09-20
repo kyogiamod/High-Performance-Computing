@@ -11,13 +11,12 @@ int readFile(char* fileName, int* in){
     fseek(file, 0L, SEEK_END);
     //ftell will return the total amount of bytes in the file
     int length = ftell(file);
-
-    char* imgArray = (char*)malloc(sizeof(char)*length);
+    unsigned char* imgArray = (unsigned char*)malloc(sizeof(char)*length);
     fseek(file, 0L, SEEK_SET);
     fread(imgArray, length, 1, file); //All content is in imgArray
     
     int i;
-    for(i = 0; i < length; i++){
+    for(i = 0; i < length/4; i++){
         in[i] = (int)imgArray[4*i];
     }
 
@@ -38,4 +37,25 @@ int saveFile(char* fileName, int* out, int rows){
         return 0;
     }
     return 1;
+}
+
+
+int main(){
+    
+
+    int* in = (int*)malloc(sizeof(int)*65536);
+    int read = readFile("test/circulos.raw", in);
+    
+    int i;
+	for (i = 0; i < 65536; i++)
+	{
+		if (i % 256 == 0)
+		{
+			printf("\n");
+		}
+		printf("%d ", in[i]);
+		
+    }
+
+    return 0;
 }
