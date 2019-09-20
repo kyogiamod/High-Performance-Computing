@@ -39,7 +39,7 @@ int saveFile(char* fileName, int* out, int rows){
     return 1;
 }
 
-
+/*
 int main(){
     
 
@@ -59,3 +59,4 @@ int main(){
 
     return 0;
 }
+*/
