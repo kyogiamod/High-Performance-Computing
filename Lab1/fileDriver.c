@@ -3,16 +3,6 @@
 #include <math.h>
 
 
-int** newMatrix(int rows){
-    int** matrix = (int**)malloc(sizeof(int*)*rows);
-    
-    int i;
-    for(i = 0; i < rows; i++){
-        matrix[i] = (int*)malloc(sizeof(int)*rows);
-    }
-    return matrix;
-}
-
 int readFile(char* fileName, int** in){
 
     FILE* file = fopen(fileName, "rb");
@@ -58,40 +48,3 @@ int saveFile(char* fileName, int** out, int rows){
     fclose(file);
     return 1;
 }
-
-/*
-int main(){
-    
-    int filas = 6;
-    int** in = newMatrix(filas);
-    int read = readFile("test/my64int.raw", in);
-    
-    int i,j;
-    
-	for (i = 0; i < filas; i++)
-	{
-        for(j = 0; j < filas; j++){
-            printf("%d ", in[i][j]);
-        }
-		printf("\n");
-    }
-
-    printf("\n");
-    //Testing out
-    saveFile("test/out.raw", in, filas);
-
-    int** in2 = newMatrix(filas);
-    int read2 = readFile("test/out.raw", in2);
-
-    for (i = 0; i < filas; i++)
-	{
-        for(j = 0; j < filas; j++){
-            printf("%d ", in2[i][j]);
-        }
-		printf("\n");
-    }
-
-
-    return 0;
-}
-*/
