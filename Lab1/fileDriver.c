@@ -1,7 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
-int readFile(char* fileName, int* in){
+
+int** newMatrix(int rows){
+    int** matrix = (int**)malloc(sizeof(int*)*rows);
+    
+    int i;
+    for(i = 0; i < rows; i++){
+        matrix[i] = (int*)malloc(sizeof(int)*rows);
+    }
+    return matrix;
+}
+
+int readFile(char* fileName, int** in){
 
     FILE* file = fopen(fileName, "rb");
 
@@ -15,9 +27,16 @@ int readFile(char* fileName, int* in){
     fseek(file, 0L, SEEK_SET);
     fread(imgArray, length, 1, file); //All content is in imgArray
     
-    int i;
-    for(i = 0; i < length/4; i++){
-        in[i] = (int)imgArray[4*i];
+    int enteros = (int)(length/4);    
+
+    int i, j;
+    int k = 0;
+    for(i = 0; i < (int)sqrt(enteros); i++){
+        for(j = 0; j < sqrt(enteros); j++){
+            in[i][j] = (int)imgArray[4*k];
+            k++;
+        }
+        
     }
 
     fclose(file);
@@ -25,37 +44,53 @@ int readFile(char* fileName, int* in){
     return 1;
 }
 
-int saveFile(char* fileName, int* out, int rows){
+int saveFile(char* fileName, int** out, int rows){
 
     FILE* file = fopen(fileName, "wb");
 
     if(!file) { printf("No se pudo abrir el archivo"); return 0; }
 
-    int length = rows * rows * sizeof(int);
-    if(fwrite(out, length, 1, file) < 1) { 
-        printf("Error guardando en el archivo");
-        return 0;
+    int i,j; 
+    for(i = 0; i < rows; i++){
+        fwrite(out[i], sizeof(int), rows, file);
     }
+
+    fclose(file);
     return 1;
 }
 
 /*
 int main(){
     
-
-    int* in = (int*)malloc(sizeof(int)*65536);
-    int read = readFile("test/circulos.raw", in);
+    int filas = 6;
+    int** in = newMatrix(filas);
+    int read = readFile("test/my64int.raw", in);
     
-    int i;
-	for (i = 0; i < 65536; i++)
+    int i,j;
+    
+	for (i = 0; i < filas; i++)
 	{
-		if (i % 256 == 0)
-		{
-			printf("\n");
-		}
-		printf("%d ", in[i]);
-		
+        for(j = 0; j < filas; j++){
+            printf("%d ", in[i][j]);
+        }
+		printf("\n");
     }
+
+    printf("\n");
+    //Testing out
+    saveFile("test/out.raw", in, filas);
+
+    int** in2 = newMatrix(filas);
+    int read2 = readFile("test/out.raw", in2);
+
+    for (i = 0; i < filas; i++)
+	{
+        for(j = 0; j < filas; j++){
+            printf("%d ", in2[i][j]);
+        }
+		printf("\n");
+    }
+
 
     return 0;
 }
