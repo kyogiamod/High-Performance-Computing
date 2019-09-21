@@ -32,3 +32,37 @@ void sequential_dilation(int** in, int** out, int row){
         }
     }
 }
+
+void simd_dilation(float** in, float** out, int rows){
+
+    __m128 R0, R1, R2, R3, R4, R5, R_max_vertical, R_max_horizontal, R_max;
+
+    int i,j,k;
+
+    for(i = 1; i < rows; i++){
+        for(j = 1; j < rows; j=(j+4)){
+            //load data
+            R0 = _mm_loadu_ps(&in[i-1][j]);
+            R1 = _mm_loadu_ps(&in[i][j-1]);
+            if((i + 1 ) >= rows){ //just border condition
+                R2 = _mm_setzero_ps();
+            } else {
+                R2 = _mm_loadu_ps(&in[i+1][j]);
+            }
+            R3 = _mm_loadu_ps(&in[i][j+1]);
+            R4 = _mm_setzero_ps();
+
+            //max in all R
+            R_max_vertical = _mm_max_ps(R0, R2);
+            R_max_horizontal = _mm_max_ps(R1, R3);
+            R_max = _mm_max_ps(R_max_horizontal, R_max_vertical);
+
+            //R4 is the max of all registers
+            R4 = _mm_max_ps(R4, R_max);
+
+            // save in the position
+            _mm_storeu_ps(&out[i][j], R4);
+        }
+    }
+
+}
