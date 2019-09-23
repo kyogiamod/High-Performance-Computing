@@ -7,7 +7,7 @@ int readFile(char* fileName, int** in){
 
     FILE* file = fopen(fileName, "rb");
 
-    if(!file) { printf("No se puede abrir el archivo"); return 0; }
+    if(!file) { printf("No se puede abrir el archivo de entrada %s\n", fileName); exit(-1); }
 
     // Unknown imagen's dimension, so
     fseek(file, 0L, SEEK_END);
@@ -38,7 +38,7 @@ int saveFile(char* fileName, int** out, int rows){
 
     FILE* file = fopen(fileName, "wb");
 
-    if(!file) { printf("No se pudo abrir el archivo"); return 0; }
+    if(!file) { printf("No se pudo abrir el archivo %s", fileName); return 0; }
 
     int i,j; 
     for(i = 0; i < rows; i++){
