@@ -6,8 +6,8 @@ typedef struct params{
     char* i;
     char* s;
     char* p;
-    int N;
-    int D;
+    int n;
+    int d;
 }parameters;
 
 int** newMatrix(int rows);
