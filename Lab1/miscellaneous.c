@@ -1,5 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>  
+#include "miscellaneous.h"
+
 
 int** newMatrix(int rows){
     int** matrix = (int**)malloc(sizeof(int*)*rows);
@@ -7,6 +10,16 @@ int** newMatrix(int rows){
     int i;
     for(i = 0; i < rows; i++){
         matrix[i] = (int*)malloc(sizeof(int)*rows);
+    }
+    return matrix;
+}
+
+float** newMatrixFloat(int rows){
+    float** matrix = (float**)malloc(sizeof(float*)*rows);
+    
+    int i;
+    for(i = 0; i < rows; i++){
+        matrix[i] = (float*)malloc(sizeof(float)*rows);
     }
     return matrix;
 }
@@ -19,14 +32,25 @@ int max(int up, int down, int left, int right){
 }
 
 
-void showFigure(int** img, int length){
+void showFigureInt(int** img, int length){
     int i,j;
     
 	for (i = 0; i < length; i++)
 	{
-        printf("%d: ", i);
         for(j = 0; j < length; j++){
             printf("%d ", img[i][j]==0?0:1);
+        }
+		printf("\n");
+    }
+}
+
+void showFigureFloat(float** img, int length){
+    int i,j;
+    
+	for (i = 0; i < length; i++)
+	{
+        for(j = 0; j < length; j++){
+            printf("%d ", img[i][j]==0.0?0:1);
         }
 		printf("\n");
     }
@@ -46,19 +70,6 @@ float** int_to_float(int** in, int rows){
     return out;
 }
 
-void showFigureFloat(float** img, int length){
-
-    int i,j;
-	for (i = 0; i < length; i++)
-	{
-        printf("%d: ", i);
-        for(j = 0; j < length; j++){
-            printf("%d ", img[i][j]==0?0:1);
-        }
-		printf("\n");
-    }
-}
-
 int** float_to_int(float**in, int length){
 
     int** out = newMatrix(length);
@@ -71,3 +82,46 @@ int** float_to_int(float**in, int length){
 
     return out;
 }
+
+parameters getopts(int argc, char **argv){
+
+    parameters params;
+
+    int opt;
+    while((opt = getopt (argc, argv, ":i:s:p:N:D:")) != -1){
+        switch(opt){
+            case 'i':
+                //printf("i: %s\n", optarg);
+                params.i = optarg;
+                break;
+            case 's':
+                //printf("s: %s\n", optarg);
+                params.s = optarg;
+                break;
+            case 'p':
+                //printf("p: %s\n", optarg);
+                params.p = optarg;
+                break;
+            case 'N':
+                //printf("N: %s\n", optarg);
+                params.n = atoi(optarg);
+                break;
+            case 'D':
+                //printf("D: %s\n", optarg);
+                params.d = atoi(optarg);
+                break;
+            case ':':
+                printf("La opcion %s necesita un valor\n", optarg);
+                break;
+            case '?':
+                printf("Existe una opcion desconocida\n");
+                exit(-1);
+        }
+    }
+    for(; optind < argc; optind++){      
+        printf("Argumentos extras: %s\n", argv[optind]);  
+    } 
+    return params;
+}
+
+
