@@ -2,6 +2,14 @@
 #define _MISCELLANEOUS_H
 
 
+typedef struct params{
+    char* i;
+    char* s;
+    char* p;
+    int N;
+    int D;
+}parameters;
+
 int** newMatrix(int rows);
 int max(int up, int down, int left, int right);
 void showFigure(int** img, int length);
