@@ -12,10 +12,10 @@ int main(int argc, char** argv){
 
     int length = (int)sqrt(params.n);
 
-    int** in = newMatrix(length);
+    int** in = newMatrixInt(length);
     int read = readFile(params.i, in);
     
-    int** outSeq = newMatrix(length);
+    int** outSeq = newMatrixInt(length);
     double seqTime = sequential_dilation(in, outSeq, length);
     saveFile(params.s, outSeq, length);
 

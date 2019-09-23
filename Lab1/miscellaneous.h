@@ -10,11 +10,13 @@ typedef struct params{
     int d;
 }parameters;
 
-int** newMatrix(int rows);
+int** newMatrixInt(int rows);
+float** newMatrixFloat(int rows);
 int max(int up, int down, int left, int right);
-void showFigure(int** img, int length);
-float** int_to_float(int** in, int rows);
+void showFigureInt(int** img, int length);
 void showFigureFloat(float** img, int length);
+float** int_to_float(int** in, int rows);
 int** float_to_int(float**in, int length);
+parameters getopts(int argc, char** argv);
 
 #endif

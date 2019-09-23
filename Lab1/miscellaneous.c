@@ -4,7 +4,7 @@
 #include "miscellaneous.h"
 
 
-int** newMatrix(int rows){
+int** newMatrixInt(int rows){
     int** matrix = (int**)malloc(sizeof(int*)*rows);
     
     int i;
@@ -72,7 +72,7 @@ float** int_to_float(int** in, int rows){
 
 int** float_to_int(float**in, int length){
 
-    int** out = newMatrix(length);
+    int** out = newMatrixInt(length);
     int i,j;
     for(i = 0; i < length; i++){
         for(j = 0; j < length; j++){
