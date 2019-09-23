@@ -1,16 +1,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <math.h>
 #include <emmintrin.h>
 #include "miscellaneous.h"
 
 
 
-void sequential_dilation(int** in, int** out, int row){
+double sequential_dilation(int** in, int** out, int row){
     
-    int i, j;
+    clock_t start = clock();	
 
+    int i, j;
     //Bordes horizontales
     for(i = 0; i < row; i=(i+row-1)){
         for(j = 0; j < row; j++){
@@ -31,9 +33,15 @@ void sequential_dilation(int** in, int** out, int row){
             out[i][j] = max(in[i-1][j], in[i+1][j], in[i][j-1], in[i][j+1]);
         }
     }
+
+    clock_t finish = clock();
+    return ((double)(finish-start)/CLOCKS_PER_SEC);	
+
 }
 
-void simd_dilation(float** in, float** out, int rows){
+double simd_dilation(float** in, float** out, int rows){
+
+    clock_t start = clock();	
 
     __m128 R0, R1, R2, R3, R4, R5, R_max_vertical, R_max_horizontal, R_max;
 
@@ -64,5 +72,8 @@ void simd_dilation(float** in, float** out, int rows){
             _mm_storeu_ps(&out[i][j], R4);
         }
     }
+
+    clock_t finish = clock();	
+    return ((double)(finish-start)/CLOCKS_PER_SEC);	
 
 }
