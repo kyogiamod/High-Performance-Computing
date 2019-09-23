@@ -1,29 +1,38 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "fileDriver.h"
 #include "dilation.h"
 #include "miscellaneous.h"
+#include <math.h>
 
-int main(){
+int main(int argc, char** argv){
 
-    int filas = 8;
-    int** in = newMatrix(filas);
-    int read = readFile("test/my64int.raw", in);
+    parameters params= getopts(argc, argv);
+
+    int length = (int)sqrt(params.n);
+
+    int** in = newMatrix(length);
+    int read = readFile(params.i, in);
     
-    int** outSeq = newMatrix(filas);
-    sequential_dilation(in, outSeq, filas);
-    saveFile("test/my64intoutsequential.raw", outSeq, filas);
+    int** outSeq = newMatrix(length);
+    double seqTime = sequential_dilation(in, outSeq, length);
+    saveFile(params.s, outSeq, length);
 
-    float** in2 = int_to_float(in, filas);
-    float** outSIMD = (float**)malloc(sizeof(float*)*filas);
-    int i,j;
-    for(i = 0; i < filas; i++){ outSIMD[i] = (float*)malloc(sizeof(float)*filas); }
-
-    simd_dilation(in2, outSIMD, filas);
-
-    int** toInt = float_to_int(outSIMD, filas);
-
-    saveFile("test/my64intout.raw", toInt, filas);
+    float** in2 = int_to_float(in, length);
+    float** outSIMD = newMatrixFloat(length);
+    double simdTime = simd_dilation(in2, outSIMD, length);
+    int** intSIMD = float_to_int(outSIMD, length);
+    saveFile(params.p, intSIMD, length);
     
+    printf("El tiempo secuencial es: %f[s]\nEl tiempo SIMD es: %f[s]\n", seqTime, simdTime);
+
+    if(params.d){
+        printf("Imagen secuencial:\n");
+        showFigureInt(outSeq, length);
+        printf("\nImagen SIMD:\n");
+        showFigureFloat(outSIMD, length);
+    }
     return 0;
 }
+
