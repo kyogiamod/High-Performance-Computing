@@ -10,7 +10,7 @@ int main(int argc, char** argv){
 
     parameters params= getopts(argc, argv);
 
-    int length = (int)sqrt(params.n);
+    int length = params.n;
 
     int** in = newMatrixInt(length);
     int read = readFile(params.i, in);
