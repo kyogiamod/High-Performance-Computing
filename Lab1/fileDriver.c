@@ -40,7 +40,7 @@ int saveFile(char* fileName, int** out, int rows){
 
     if(!file) { printf("No se pudo abrir el archivo %s", fileName); return 0; }
 
-    int i,j; 
+    int i; 
     for(i = 0; i < rows; i++){
         fwrite(out[i], sizeof(int), rows, file);
     }

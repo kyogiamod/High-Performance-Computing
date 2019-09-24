@@ -13,7 +13,7 @@ int main(int argc, char** argv){
     int length = params.n;
 
     int** in = newMatrixInt(length);
-    int read = readFile(params.i, in);
+    readFile(params.i, in);
     
     int** outSeq = newMatrixInt(length);
     double seqTime = sequential_dilation(in, outSeq, length);

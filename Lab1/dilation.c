@@ -43,9 +43,9 @@ double simd_dilation(float** in, float** out, int rows){
 
     clock_t start = clock();	
 
-    __m128 R0, R1, R2, R3, R4, R5, R_max_vertical, R_max_horizontal, R_max;
+    __m128 R0, R1, R2, R3, R4, R_max_vertical, R_max_horizontal, R_max;
 
-    int i,j,k;
+    int i,j;
 
     for(i = 1; i < rows; i++){
         for(j = 1; j < rows; j=(j+4)){
