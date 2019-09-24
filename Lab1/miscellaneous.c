@@ -88,26 +88,21 @@ parameters getopts(int argc, char **argv){
     parameters params;
 
     int opt;
-    while((opt = getopt (argc, argv, ":i:s:p:N:D:")) != -1){
+    while((opt = getopt (argc, argv, "i:s:p:N:D:")) != -1){
         switch(opt){
             case 'i':
-                //printf("i: %s\n", optarg);
                 params.i = optarg;
                 break;
             case 's':
-                //printf("s: %s\n", optarg);
                 params.s = optarg;
                 break;
             case 'p':
-                //printf("p: %s\n", optarg);
                 params.p = optarg;
                 break;
             case 'N':
-                //printf("N: %s\n", optarg);
                 params.n = atoi(optarg);
                 break;
             case 'D':
-                //printf("D: %s\n", optarg);
                 params.d = atoi(optarg);
                 break;
             case ':':
@@ -119,7 +114,8 @@ parameters getopts(int argc, char **argv){
         }
     }
     for(; optind < argc; optind++){      
-        printf("Argumentos extras: %s\n", argv[optind]);  
+        printf("Argumentos extras: %s\n", argv[optind]); 
+        exit(-1); 
     } 
     return params;
 }
