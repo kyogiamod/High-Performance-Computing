@@ -78,25 +78,18 @@ double** mandelbrot_parallel(coordinate c, int depth, double muestreo, int threa
 
     double **matrix = new_matrix(pixels_x, pixels_y);
 
-    int i, j;
-    #pragma omp for
-    for(i = 0; i < 20; i++){
-        printf("tid: %d, i=%d\n", omp_get_thread_num(), i);
-    }
-    return matrix;
-    /*
-
-
+    int i, j, n;
+    #pragma omp parallel num_threads(threads)
+    #pragma omp for firstprivate(pixels_x, pixels_y, c)
     for (i = 0; i < pixels_x; i++)
     {
-        //printf("i: %d\n", i);
         for (j = 0; j < pixels_y; j++)
         {
             matrix[i][j] = mandel_algorithm((c.inf_x + i * muestreo), (c.inf_y + j * muestreo), depth);
         }
     }
+    
     return matrix;
-    */
 }
 
 void saveIMG(char *filename, double **matrix, int rows, int cols)
