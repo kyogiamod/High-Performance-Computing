@@ -1,13 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 
-typedef struct posMatrix{
-    double inf_x;
-    double inf_y;
-    double sup_x;
-    double sup_y;
-}coordinate;
+typedef struct parametros
+{
+    int i;
+    double a;
+    double b;
+    double c;
+    double d;
+    double muestreo;
+    char *filename;
+} params;
 
 typedef struct complejo{
     double r;
@@ -64,18 +69,17 @@ double mandel_algorithm(double x, double y, int depth){
     return (double)(log(n) + 1.0);
 }
 
-double** mandelbrot_seq(coordinate c, int depth, double muestreo)
+double** mandelbrot_seq(params p)
 {
-    int pixels_x = ((c.sup_x - c.inf_x)/muestreo) + 1;
-    int pixels_y = ((c.sup_y - c.inf_y)/muestreo) + 1;
+    int pixels_x = ((p.c - p.a) / p.muestreo + 1.0);
+    int pixels_y = ((p.d - p.b) / p.muestreo + 1.0);
 
     double** matrix = new_matrix(pixels_x, pixels_y);
 
     int i,j;
     for(i = 0; i < pixels_x; i++){
-        //printf("i: %d\n", i);
         for(j = 0; j < pixels_y; j++){
-            matrix[i][j] = mandel_algorithm( (c.inf_x + i * muestreo), (c.inf_y + j * muestreo), depth );
+            matrix[i][j] = mandel_algorithm( (p.a + i * p.muestreo), (p.b + j * p.muestreo), p.i );
         }
     }
     return matrix;
@@ -105,30 +109,51 @@ void saveIMG(char* filename, double** matrix, int rows, int cols){
     fclose(file);
 }
 
+params getParams(int argc, char **argv)
+{
+    params p;
+    char c;
 
-int main(){
-    int depth = 500;
+    while ((c = getopt(argc, argv, "i:a:b:c:d:s:f:")) != -1)
+    {
+        switch (c)
+        {
+        case 'i': //depth
+            p.i = atoi(optarg);
+            break;
+        case 'a': //lim inferior real
+            p.a = atof(optarg);
+            break;
+        case 'b': //lim inferior img
+            p.b = atof(optarg);
+            break;
+        case 'c': //lim superior real
+            p.c = atof(optarg);
+            break;
+        case 'd': //lim superior img
+            p.d = atof(optarg);
+            break;
+        case 's': //muestreo
+            p.muestreo = atof(optarg);
+            break;
+        case 'f': //archivo de salida
+            p.filename = optarg;
+            break;
+        }
+    }
+    return p;
+}
 
-    coordinate c;
+
+int main(int argc, char** argv){
     
-    c.inf_x = -0.748766713922161;
-    c.inf_y = 0.123640844894862;
-    c.sup_x = -0.748766707771757;
-    c.sup_y = 0.123640851045266;
-    double muestreo = 1e-11;
+    params p = getParams(argc, argv);
 
-    /*
-    c.inf_x = -1;
-    c.inf_y = -1;
-    c.sup_x = 1;
-    c.sup_y = 1;
-    double muestreo = 0.001;
-    */
-    int pixels_x = (int)((c.sup_x - c.inf_x) / muestreo + 1.0);
-    int pixels_y = (int)((c.sup_y - c.inf_y) / muestreo + 1.0);
+    int pixels_x = ((p.c - p.a) / p.muestreo + 1.0);
+    int pixels_y = ((p.d - p.b) / p.muestreo + 1.0);
 
 
-    double** img = mandelbrot_seq(c, depth, muestreo);
+    double** img = mandelbrot_seq(p);
 
-    saveIMG("seq.raw", img, pixels_x, pixels_y);
+    saveIMG(p.filename, img, pixels_x, pixels_y);
 }

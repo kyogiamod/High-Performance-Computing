@@ -1,20 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
-typedef struct posMatrix
-{
-    double inf_x;
-    double inf_y;
-    double sup_x;
-    double sup_y;
-} coordinate;
+#include <unistd.h>
 
 typedef struct complejo
 {
     double r;
     double i;
 } complex;
+
+typedef struct parametros
+{
+    int i;
+    double a;
+    double b;
+    double c;
+    double d;
+    double muestreo;
+    char* filename;
+    int threads;
+}params;
+
 
 double complex_distance(complex c)
 {
@@ -66,22 +72,24 @@ double mandel_algorithm(double x, double y, int depth)
     return (double)(log(n) + 1.0);
 }
 
-double** mandelbrot_parallel(coordinate c, int depth, double muestreo, int threads)
+double** mandelbrot_parallel(params p)
 {
-    int pixels_x = ((c.sup_x - c.inf_x) / muestreo) + 1;
-    int pixels_y = ((c.sup_y - c.inf_y) / muestreo) + 1;
+    //printf("%f, %f\n", p.c, p.a);
+    
+    int pixels_x = (int)((p.c - p.a) / p.muestreo) + 1;
+    int pixels_y = (int)((p.d - p.b) / p.muestreo) + 1;
 
     double **matrix = new_matrix(pixels_x, pixels_y);
 
     int i, j;
-    #pragma omp parallel num_threads(threads)
+    #pragma omp parallel num_threads(p.threads)
     {
         #pragma omp for private(j)
         for (i = 0; i < pixels_x; i++)
         {
             for (j = 0; j < pixels_y; j++)
             {
-                matrix[i][j] = mandel_algorithm((c.inf_x + i * muestreo), (c.inf_y + j * muestreo), depth);
+                matrix[i][j] = mandel_algorithm((p.a + i * p.muestreo), (p.b + j * p.muestreo), p.i);
             }
         }
     }
@@ -89,7 +97,7 @@ double** mandelbrot_parallel(coordinate c, int depth, double muestreo, int threa
     return matrix;
 }
 
-void saveIMG(char *filename, double **matrix, int rows, int cols)
+void saveIMG(char* filename, double** matrix, int rows, int cols)
 {
     FILE *file = fopen(filename, "wb");
 
@@ -118,32 +126,56 @@ void saveIMG(char *filename, double **matrix, int rows, int cols)
     fclose(file);
 }
 
-int main()
+params getParams(int argc, char** argv)
 {
-    int depth = 500;
+    params p;
+    char c;
 
-    coordinate c;
+    while ((c = getopt(argc, argv, "i:a:b:c:d:s:f:t:")) != -1)
+    {
+        switch (c)
+        {
+        case 'i': //depth
+            p.i = atoi(optarg);
+            break;
+        case 'a': //lim inferior real
+            p.a = atof(optarg);
+            break;
+        case 'b': //lim inferior img
+            p.b = atof(optarg);
+            break;
+        case 'c': //lim superior real
+            p.c = atof(optarg);
+            break;
+        case 'd': //lim superior img
+            p.d = atof(optarg);
+            break;
+        case 's': //muestreo
+            p.muestreo = atof(optarg);
+            break;
+        case 'f': //archivo de salida
+            p.filename = optarg;
+            break;
+        case 't': //numero hilos
+            p.threads = atoi(optarg);
+            break;
+        }
+    }
+    return p;
+}
+
+int main(int argc, char** argv)
+{
+    params p = getParams(argc, argv);
+
+    double muestreo = p.muestreo;
+
+    double** img = mandelbrot_parallel(p);
     
-    c.inf_x = -0.748766713922161;
-    c.inf_y = 0.123640844894862;
-    c.sup_x = -0.748766707771757;
-    c.sup_y = 0.123640851045266;
-    double muestreo = 1e-11;
-    
-    /*
-    c.inf_x = -1;
-    c.inf_y = -1;
-    c.sup_x = 1;
-    c.sup_y = 1;
-    double muestreo = 0.001;
-    */
+    int pixels_x = (int)((p.c - p.a) / p.muestreo + 1.0);
+    int pixels_y = (int)((p.d - p.b) / p.muestreo + 1.0);
 
-    char *fileout = "salida.raw";
+    saveIMG(p.filename, img, pixels_x, pixels_y);
 
-    int pixels_x = (int)((c.sup_x - c.inf_x) / muestreo + 1.0);
-    int pixels_y = (int)((c.sup_y - c.inf_y) / muestreo + 1.0);
-
-    double **img = mandelbrot_parallel(c, depth, muestreo, 4);
-
-    saveIMG("par.raw", img, pixels_x, pixels_y);
+    return 0;
 }
