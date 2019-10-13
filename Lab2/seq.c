@@ -110,19 +110,25 @@ int main(){
     int depth = 500;
 
     coordinate c;
+    
     c.inf_x = -0.748766713922161;
     c.inf_y = 0.123640844894862;
     c.sup_x = -0.748766707771757;
     c.sup_y = 0.123640851045266;
-
     double muestreo = 1e-11;
-    char* fileout = "salida.raw";
-    
+
+    /*
+    c.inf_x = -1;
+    c.inf_y = -1;
+    c.sup_x = 1;
+    c.sup_y = 1;
+    double muestreo = 0.001;
+    */
     int pixels_x = (int)((c.sup_x - c.inf_x) / muestreo + 1.0);
     int pixels_y = (int)((c.sup_y - c.inf_y) / muestreo + 1.0);
 
 
     double** img = mandelbrot_seq(c, depth, muestreo);
 
-    saveIMG("out.raw", img, pixels_x, pixels_y);
+    saveIMG("seq.raw", img, pixels_x, pixels_y);
 }

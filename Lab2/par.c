@@ -48,11 +48,6 @@ double **new_matrix(int rows, int cols)
     return matrix;
 }
 
-char *new_string(int length)
-{
-    char *string = (char *)malloc(sizeof(char) * length);
-    return string;
-}
 
 double mandel_algorithm(double x, double y, int depth)
 {
@@ -78,17 +73,19 @@ double** mandelbrot_parallel(coordinate c, int depth, double muestreo, int threa
 
     double **matrix = new_matrix(pixels_x, pixels_y);
 
-    int i, j, n;
+    int i, j;
     #pragma omp parallel num_threads(threads)
-    #pragma omp for firstprivate(pixels_x, pixels_y, c)
-    for (i = 0; i < pixels_x; i++)
     {
-        for (j = 0; j < pixels_y; j++)
+        #pragma omp for private(j)
+        for (i = 0; i < pixels_x; i++)
         {
-            matrix[i][j] = mandel_algorithm((c.inf_x + i * muestreo), (c.inf_y + j * muestreo), depth);
+            for (j = 0; j < pixels_y; j++)
+            {
+                matrix[i][j] = mandel_algorithm((c.inf_x + i * muestreo), (c.inf_y + j * muestreo), depth);
+            }
         }
     }
-    
+
     return matrix;
 }
 
@@ -126,12 +123,21 @@ int main()
     int depth = 500;
 
     coordinate c;
+    
     c.inf_x = -0.748766713922161;
     c.inf_y = 0.123640844894862;
     c.sup_x = -0.748766707771757;
     c.sup_y = 0.123640851045266;
-
     double muestreo = 1e-11;
+    
+    /*
+    c.inf_x = -1;
+    c.inf_y = -1;
+    c.sup_x = 1;
+    c.sup_y = 1;
+    double muestreo = 0.001;
+    */
+
     char *fileout = "salida.raw";
 
     int pixels_x = (int)((c.sup_x - c.inf_x) / muestreo + 1.0);
@@ -139,5 +145,5 @@ int main()
 
     double **img = mandelbrot_parallel(c, depth, muestreo, 4);
 
-    //saveIMG("out.raw", img, pixels_x, pixels_y);
+    saveIMG("par.raw", img, pixels_x, pixels_y);
 }
